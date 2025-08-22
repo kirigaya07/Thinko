@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 import { Cover } from "@/components/cover";
 import { Toolbar } from "@/components/toolbar";
@@ -29,12 +29,15 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
 
   const update = useMutation(api.documents.update);
 
-  const onChange = (content: string) => {
-    update({
-      id: params.documentId,
-      content,
-    });
-  };
+  const onChange = useCallback(
+    (content: string) => {
+      update({
+        id: params.documentId,
+        content,
+      });
+    },
+    [update, params.documentId],
+  );
 
   if (document === undefined) {
     return (
@@ -66,4 +69,5 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     </div>
   );
 };
+
 export default DocumentIdPage;

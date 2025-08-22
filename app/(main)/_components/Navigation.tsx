@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ElementRef, useEffect, useRef, useState } from "react";
+import React, { ElementRef, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import { useMutation } from "convex/react";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -60,7 +60,7 @@ const Navigation = () => {
     }
   }, [pathname, isMobile]);
 
-  const handleMouseDown = (
+  const handleMouseDown = useCallback((
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
     event.preventDefault();
@@ -69,9 +69,9 @@ const Navigation = () => {
     isResizingRef.current = true;
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
-  };
+  }, []);
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isResizingRef.current) return;
     let newWidth = e.clientX;
 
@@ -86,15 +86,15 @@ const Navigation = () => {
         `calc(100% - ${newWidth}px)`,
       );
     }
-  };
+  }, []);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     isResizingRef.current = false;
     document.removeEventListener("mousemove", handleMouseMove);
     document.removeEventListener("mouseup", handleMouseUp);
-  };
+  }, [handleMouseMove]);
 
-  const resetWidth = () => {
+  const resetWidth = useCallback(() => {
     if (sidebarRef.current && navbarRef.current) {
       setIsCollapsed(false);
       setIsResetting(true);
@@ -108,9 +108,9 @@ const Navigation = () => {
       navbarRef.current.style.setProperty("left", isMobile ? "100%" : "240px");
       setTimeout(() => setIsResetting(false), 300);
     }
-  };
+  }, [isMobile]);
 
-  const collapse = () => {
+  const collapse = useCallback(() => {
     if (sidebarRef.current && navbarRef.current) {
       setIsCollapsed(true);
       setIsResetting(true);
@@ -120,9 +120,9 @@ const Navigation = () => {
       navbarRef.current.style.setProperty("left", "0");
       setTimeout(() => setIsResetting(false), 300);
     }
-  };
+  }, []);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     const promise = create({ title: "Untitled" }).then((documentId) =>
       router.push(`/documents/${documentId}`),
     );
@@ -132,17 +132,39 @@ const Navigation = () => {
       success: "New note created.",
       error: "Failed to create a note.",
     });
-  };
+  }, [create, router]);
+
+  // Memoize the sidebar className to prevent unnecessary re-renders
+  const sidebarClassName = useMemo(() => {
+    return cn(
+      "group/sidebar relative z-[300] flex h-full w-60 flex-col overflow-y-auto bg-secondary",
+      isResetting && "transition-all duration-300 ease-in-out",
+      isMobile && "w-0",
+    );
+  }, [isResetting, isMobile]);
+
+  // Memoize the navbar className
+  const navbarClassName = useMemo(() => {
+    return cn(
+      "absolute left-60 top-0 z-[300] w-[calc(100%-240px)]",
+      isResetting && "transition-all duration-300 ease-in-out",
+      isMobile && "left-0 w-full",
+    );
+  }, [isResetting, isMobile]);
+
+  // Memoize the navbar nav className
+  const navbarNavClassName = useMemo(() => {
+    return cn(
+      "w-full bg-transparent px-3 py-2",
+      !isCollapsed && "p-0",
+    );
+  }, [isCollapsed]);
 
   return (
     <>
       <aside
         ref={sidebarRef}
-        className={cn(
-          "group/sidebar relative z-[300] flex h-full w-60 flex-col overflow-y-auto bg-secondary",
-          isResetting && "transition-all duration-300 ease-in-out",
-          isMobile && "w-0",
-        )}
+        className={sidebarClassName}
       >
         <div
           onClick={collapse}
@@ -183,21 +205,12 @@ const Navigation = () => {
       </aside>
       <div
         ref={navbarRef}
-        className={cn(
-          "absolute left-60 top-0 z-[300] w-[calc(100%-240px)]",
-          isResetting && "transition-all duration-300 ease-in-out",
-          isMobile && "left-0 w-full",
-        )}
+        className={navbarClassName}
       >
         {!!params.documentId ? (
           <Navbar isCollapsed={isCollapsed} onResetWidth={resetWidth} />
         ) : (
-          <nav
-            className={cn(
-              "w-full bg-transparent px-3 py-2",
-              !isCollapsed && "p-0",
-            )}
-          >
+          <nav className={navbarNavClassName}>
             {isCollapsed && (
               <MenuIcon
                 onClick={resetWidth}
@@ -211,4 +224,5 @@ const Navigation = () => {
     </>
   );
 };
+
 export default Navigation;

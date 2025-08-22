@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { File } from "lucide-react";
 import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -43,10 +43,37 @@ export const SearchCommand = () => {
     return () => document.removeEventListener("keydown", down);
   }, [toggle]);
 
-  const onSelect = (id: string) => {
-    router.push(`/documents/${id}`);
-    onClose();
-  };
+  const onSelect = useCallback(
+    (id: string) => {
+      router.push(`/documents/${id}`);
+      onClose();
+    },
+    [router, onClose],
+  );
+
+  // Memoize the search placeholder text
+  const searchPlaceholder = useMemo(() => {
+    return `Search ${user?.fullName}'s Thinko..`;
+  }, [user?.fullName]);
+
+  // Memoize the documents mapping to prevent unnecessary re-renders
+  const documentItems = useMemo(() => {
+    return documents?.map((document) => (
+      <CommandItem
+        key={document._id}
+        value={document._id}
+        title={document.title}
+        onSelect={onSelect}
+      >
+        {document.icon ? (
+          <p className="mr-2 text-[1.125rem]">{document.icon}</p>
+        ) : (
+          <File className="mr-2 h-4 w-4" />
+        )}
+        <span>{document.title}</span>
+      </CommandItem>
+    ));
+  }, [documents, onSelect]);
 
   if (!isMounted) {
     return null;
@@ -54,26 +81,10 @@ export const SearchCommand = () => {
 
   return (
     <CommandDialog open={isOpen} onOpenChange={onClose}>
-      <CommandInput placeholder={`Search ${user?.fullName}'s Thinko..`} />
+      <CommandInput placeholder={searchPlaceholder} />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Documents">
-          {documents?.map((document) => (
-            <CommandItem
-              key={document._id}
-              value={document._id}
-              title={document.title}
-              onSelect={onSelect}
-            >
-              {document.icon ? (
-                <p className="mr-2 text-[1.125rem]">{document.icon}</p>
-              ) : (
-                <File className="mr-2 h-4 w-4" />
-              )}
-              <span>{document.title}</span>
-            </CommandItem>
-          ))}
-        </CommandGroup>
+        <CommandGroup heading="Documents">{documentItems}</CommandGroup>
       </CommandList>
     </CommandDialog>
   );
