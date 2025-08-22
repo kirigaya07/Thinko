@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCallback, useRef } from 'react';
 
 /**
