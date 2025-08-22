@@ -1,83 +1,69 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef } from "react";
 
 /**
- * Custom hook for creating optimized callbacks with debouncing
- * @param callback The function to debounce
- * @param delay The delay in milliseconds
- * @param deps Dependencies array for useCallback
- * @returns Debounced callback function
+ * Custom hook for creating debounced callbacks
  */
-export const useDebouncedCallback = <T extends (...args: any[]) => any>(
-  callback: T,
+export const useDebouncedCallback = (
+  callback: (...args: any[]) => void,
   delay: number,
-  deps: React.DependencyList = []
-): T => {
+  deps: React.DependencyList = [],
+) => {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   return useCallback(
-    ((...args: Parameters<T>) => {
+    (...args: any[]) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
       timeoutRef.current = setTimeout(() => {
         callback(...args);
       }, delay);
-    }) as T,
-    [callback, delay, ...deps]
+    },
+    [callback, delay, ...deps],
   );
 };
 
 /**
  * Custom hook for creating throttled callbacks
- * @param callback The function to throttle
- * @param delay The delay in milliseconds
- * @param deps Dependencies array for useCallback
- * @returns Throttled callback function
  */
-export const useThrottledCallback = <T extends (...args: any[]) => any>(
-  callback: T,
+export const useThrottledCallback = (
+  callback: (...args: any[]) => void,
   delay: number,
-  deps: React.DependencyList = []
-): T => {
+  deps: React.DependencyList = [],
+) => {
   const lastRun = useRef(0);
 
   return useCallback(
-    ((...args: Parameters<T>) => {
+    (...args: any[]) => {
       const now = Date.now();
       if (now - lastRun.current >= delay) {
         lastRun.current = now;
         callback(...args);
       }
-    }) as T,
-    [callback, delay, ...deps]
+    },
+    [callback, delay, ...deps],
   );
 };
 
 /**
- * Custom hook for creating stable references to objects
- * @param value The value to create a stable reference for
- * @returns Stable reference to the value
+ * Custom hook for creating stable references
  */
-export const useStableRef = <T>(value: T): React.MutableRefObject<T> => {
-  const ref = useRef<T>(value);
+export const useStableRef = (value: any) => {
+  const ref = useRef(value);
   ref.current = value;
   return ref;
 };
 
 /**
  * Custom hook for creating optimized event handlers
- * @param handler The event handler function
- * @param options Options for the event handler
- * @param deps Dependencies array for useCallback
- * @returns Optimized event handler
  */
-export const useOptimizedHandler = <T extends Event>(
-  handler: (event: T) => void,
+export const useOptimizedHandler = (
+  handler: (event: any) => void,
   options: { preventDefault?: boolean; stopPropagation?: boolean } = {},
-  deps: React.DependencyList = []
+  deps: React.DependencyList = [],
 ) => {
   return useCallback(
-    (event: T) => {
+    (event: any) => {
       if (options.preventDefault) {
         event.preventDefault();
       }
@@ -86,24 +72,6 @@ export const useOptimizedHandler = <T extends Event>(
       }
       handler(event);
     },
-    [handler, options.preventDefault, options.stopPropagation, ...deps]
-  );
-};
-
-/**
- * Custom hook for creating optimized state setters
- * @param setState The state setter function
- * @param deps Dependencies array for useCallback
- * @returns Optimized state setter
- */
-export const useOptimizedSetter = <T>(
-  setState: React.Dispatch<React.SetStateAction<T>>,
-  deps: React.DependencyList = []
-) => {
-  return useCallback(
-    (value: React.SetStateAction<T>) => {
-      setState(value);
-    },
-    [setState, ...deps]
+    [handler, options.preventDefault, options.stopPropagation, ...deps],
   );
 };
