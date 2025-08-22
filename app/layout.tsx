@@ -8,7 +8,13 @@ import { ConvexClientProvider } from "@/components/providers/convex-provider";
 import { ModalProvider } from "@/components/providers/modal-provider";
 import { EdgeStoreProvider } from "@/lib/edgestore";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "arial"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Thinko",
@@ -28,6 +34,9 @@ export const metadata: Metadata = {
       },
     ],
   },
+  other: {
+    "font-display": "swap",
+  },
 };
 
 export default function RootLayout({
@@ -37,7 +46,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head>
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-var.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
+      <body className={`${inter.className} ${inter.variable}`}>
         <ConvexClientProvider>
           <EdgeStoreProvider>
             <ThemeProvider

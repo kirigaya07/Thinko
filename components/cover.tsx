@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { imageConfig } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { ImageIcon, X } from "lucide-react";
@@ -44,7 +45,26 @@ export const Cover = ({ url, preview }: CoverImageProps) => {
       )}
     >
       {!!url && (
-        <Image src={url} fill alt="cover" className="object-cover" priority />
+        <Image
+          src={url}
+          fill
+          alt="Document cover image"
+          className="object-cover"
+          priority={true}
+          quality={imageConfig.quality}
+          sizes={imageConfig.getResponsiveSizes(1200)}
+          placeholder="blur"
+          blurDataURL={imageConfig.getBlurDataURL()}
+          onLoad={(e) => {
+            // Optimize image loading performance
+            const img = e.target as HTMLImageElement;
+            img.style.opacity = "1";
+          }}
+          style={{
+            opacity: 0,
+            transition: "opacity 0.3s ease-in-out",
+          }}
+        />
       )}
       {url && !preview && (
         <div className="absolute bottom-5 right-5 flex items-center gap-x-2 opacity-0 group-hover:opacity-100">
