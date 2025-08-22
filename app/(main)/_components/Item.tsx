@@ -180,7 +180,8 @@ const Item = React.memo(({
 
 Item.displayName = "Item";
 
-Item.Skeleton = function ItemSkeleton({ level }: { level?: number }) {
+// Create Skeleton component separately to preserve static property access
+const ItemSkeleton = ({ level }: { level?: number }) => {
   const skeletonPaddingStyle = useMemo(() => {
     return { paddingLeft: level ? `${level * 12 + 25}px` : "12px" };
   }, [level]);
@@ -196,4 +197,5 @@ Item.Skeleton = function ItemSkeleton({ level }: { level?: number }) {
   );
 };
 
-export { Item };
+// Export both the memoized component and the skeleton
+export { Item, ItemSkeleton };

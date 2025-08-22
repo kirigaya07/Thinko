@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 
-import { Item } from "./Item";
+import { Item, ItemSkeleton } from "./Item";
 
 import { FileIcon } from "lucide-react";
 
@@ -55,11 +55,11 @@ const DocumentList = React.memo(
     if (documents === undefined) {
       return (
         <>
-          <Item.Skeleton level={level} />
+          <ItemSkeleton level={level} />
           {level === 0 && (
             <>
-              <Item.Skeleton level={level} />
-              <Item.Skeleton level={level} />
+              <ItemSkeleton level={level} />
+              <ItemSkeleton level={level} />
             </>
           )}
         </>
