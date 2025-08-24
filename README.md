@@ -1,179 +1,156 @@
-# Notion Clone
+# Thinko – Notion Clone
 
-A full-featured Notion clone built with Next.js, Convex, Clerk, and EdgeStore.
+Thinko is a full-featured Notion clone built with Next.js, Convex, Clerk, and EdgeStore. It provides real-time collaborative editing and a modern, responsive experience.
 
 ## Features
 
 - Real-time collaborative editing
-- User authentication with Clerk
-- File uploads with EdgeStore
-- Rich text editing with BlockNote
-- Dark/light theme support
-- Responsive design
+- Secure user authentication via Clerk
+- File uploads using EdgeStore
+- Rich text editing powered by BlockNote
+- Light and dark mode themes
+- Fully responsive design
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Backend**: Convex (real-time database)
-- **Authentication**: Clerk
-- **File Storage**: EdgeStore
-- **Styling**: Tailwind CSS
-- **Rich Text Editor**: BlockNote
-- **State Management**: Zustand
+- **Frontend:** Next.js 14, React 18, TypeScript
+- **Backend:** Convex (real-time database)
+- **Authentication:** Clerk
+- **File Storage:** EdgeStore
+- **Styling:** Tailwind CSS
+- **Rich Text Editor:** BlockNote
+- **State Management:** Zustand
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js v18 or higher
 - npm or yarn
-- Convex account
-- Clerk account
-- EdgeStore account
+- Accounts for Convex, Clerk, and EdgeStore
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
+    ```bash
+    git clone <your-repo-url>
+    cd notion-clone
+    ```
 
-```bash
-git clone <your-repo-url>
-cd notion-clone
-```
+2. **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-2. Install dependencies:
+3. **Set up environment variables:**
+    ```bash
+    cp env.example .env.local
+    ```
+    Edit `.env.local` and configure your environment variables.
 
-```bash
-npm install
-```
+4. **Run the development server:**
+    ```bash
+    npm run dev
+    ```
 
-3. Set up environment variables:
+## Deploying to Vercel
 
-```bash
-cp env.example .env.local
-```
+### 1. Prepare the Project
 
-4. Configure your environment variables in `.env.local`
-
-5. Run the development server:
-
-```bash
-npm run dev
-```
-
-## Deployment to Vercel
-
-### 1. Prepare Your Project
-
-Ensure your project builds successfully locally:
-
+Make sure your app builds locally:
 ```bash
 npm run build
 ```
 
-### 2. Deploy to Vercel
+### 2. Deploy
 
-#### Option A: Using Vercel CLI
+#### Option A: Vercel CLI
 
-1. Install Vercel CLI:
-
-```bash
-npm i -g vercel
-```
-
+1. Install the CLI:
+    ```bash
+    npm i -g vercel
+    ```
 2. Deploy:
+    ```bash
+    vercel
+    ```
 
-```bash
-vercel
-```
+#### Option B: Vercel Dashboard
 
-#### Option B: Using Vercel Dashboard
+1. Push your code to GitHub, GitLab, or Bitbucket.
+2. Sign in at [vercel.com](https://vercel.com).
+3. Click "New Project" and import your repository.
+4. Configure environment variables (see below).
+5. Deploy.
 
-1. Push your code to GitHub/GitLab/Bitbucket
-2. Go to [vercel.com](https://vercel.com) and sign in
-3. Click "New Project"
-4. Import your repository
-5. Configure environment variables (see below)
-6. Deploy
+### 3. Environment Variables
 
-### 3. Environment Variables Setup
+Add these variables in your Vercel project dashboard:
 
-In your Vercel project dashboard, add these environment variables:
+**Required:**
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` – Clerk publishable key
+- `CLERK_SECRET_KEY` – Clerk secret key
+- `NEXT_PUBLIC_CONVEX_URL` – Convex deployment URL
+- `EDGE_STORE_ACCESS_KEY` – EdgeStore access key
+- `EDGE_STORE_SECRET_KEY` – EdgeStore secret key
 
-#### Required Variables:
+**Optional:**
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL` – Custom sign-in URL (default: `/sign-in`)
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL` – Custom sign-up URL (default: `/sign-up`)
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` – Redirect after sign-in (default: `/`)
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` – Redirect after sign-up (default: `/`)
 
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Your Clerk publishable key
-- `CLERK_SECRET_KEY` - Your Clerk secret key
-- `NEXT_PUBLIC_CONVEX_URL` - Your Convex deployment URL
-- `EDGE_STORE_ACCESS_KEY` - Your EdgeStore access key
-- `EDGE_STORE_SECRET_KEY` - Your EdgeStore secret key
+### 4. Clerk Configuration
 
-#### Optional Variables:
+- Add your Vercel domain to allowed origins in the Clerk dashboard.
+- Update Clerk configuration in `convex/auth.config.js` for production.
 
-- `NEXT_PUBLIC_CLERK_SIGN_IN_URL` - Custom sign-in URL (default: `/sign-in`)
-- `NEXT_PUBLIC_CLERK_SIGN_UP_URL` - Custom sign-up URL (default: `/sign-up`)
-- `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` - Redirect after sign-in (default: `/`)
-- `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` - Redirect after sign-up (default: `/`)
+### 5. Convex Configuration
 
-### 4. Update Clerk Configuration
+- Deploy Convex functions:
+    ```bash
+    npx convex dev --once
+    ```
+- Update `NEXT_PUBLIC_CONVEX_URL` in Vercel with your production Convex URL.
 
-1. Go to your Clerk dashboard
-2. Add your Vercel domain to allowed origins
-3. Update the auth configuration in `convex/auth.config.js` with your production domain
+### 6. EdgeStore Configuration
 
-### 5. Update Convex Configuration
+- Add your Vercel domain to allowed origins in EdgeStore.
+- Ensure your EdgeStore keys are set in Vercel.
 
-1. Deploy your Convex functions:
-
-```bash
-npx convex dev --once
-```
-
-2. Update `NEXT_PUBLIC_CONVEX_URL` in Vercel with your production Convex URL
-
-### 6. Update EdgeStore Configuration
-
-1. Go to your EdgeStore dashboard
-2. Add your Vercel domain to allowed origins
-3. Ensure your EdgeStore keys are correctly set in Vercel
-
-## Post-Deployment
-
-After deployment, verify:
+## Post-Deployment Checklist
 
 - Authentication works correctly
 - File uploads function properly
-- Real-time collaboration is working
+- Real-time collaboration is functional
 - All routes are accessible
 
 ## Troubleshooting
 
 ### Build Errors
 
-- Ensure all dependencies are in `package.json`
-- Check that all environment variables are set
-- Verify TypeScript compilation passes locally
+- Make sure all dependencies are listed in `package.json`
+- Confirm all environment variables are set
+- Ensure TypeScript compiles without errors
 
 ### Runtime Errors
 
 - Check Vercel function logs
-- Verify environment variables are correctly set
-- Ensure external services (Clerk, Convex, EdgeStore) are accessible
+- Verify environment variable configuration
+- Confirm access to Clerk, Convex, and EdgeStore
 
 ### Performance Issues
 
-- Check Vercel analytics
-- Monitor function execution times
-- Consider upgrading to Vercel Pro for better performance
+- Review Vercel analytics and function execution times
+- Consider upgrading to Vercel Pro for enhanced performance
 
 ## Support
 
-For issues related to:
-
-- **Vercel**: Check [Vercel documentation](https://vercel.com/docs)
-- **Next.js**: Check [Next.js documentation](https://nextjs.org/docs)
-- **Convex**: Check [Convex documentation](https://docs.convex.dev)
-- **Clerk**: Check [Clerk documentation](https://clerk.com/docs)
-- **EdgeStore**: Check [EdgeStore documentation](https://edgestore.dev/docs)
+- [Vercel Documentation](https://vercel.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Convex Documentation](https://docs.convex.dev)
+- [Clerk Documentation](https://clerk.com/docs)
+- [EdgeStore Documentation](https://edgestore.dev/docs)
 
 ## License
 
