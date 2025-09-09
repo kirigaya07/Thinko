@@ -1,10 +1,10 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "functions": {
-    "app/api/ai/rewrite/route.ts": {
-      "maxDuration": 30
+    "buildCommand": "npm run build",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "functions": {
+        "app/api/ai/rewrite/route.ts": {
+            "maxDuration": 30
+        }
     }
-  }
 }
