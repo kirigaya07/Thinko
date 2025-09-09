@@ -22,8 +22,10 @@ import {
   MoreHorizontal,
   Plus,
   Trash,
+  Wand2,
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
+import { useRewrite } from "@/hooks/useRewrite";
 
 interface ItemProps {
   id?: Id<"documents">;
@@ -36,6 +38,7 @@ interface ItemProps {
   label: string;
   onClick?: () => void;
   icon: LucideIcon;
+  content?: string;
 }
 
 const Item = React.memo(({
@@ -49,11 +52,14 @@ const Item = React.memo(({
   level = 0,
   onExpand,
   expanded,
+  content,
 }: ItemProps) => {
   const { user } = useUser();
   const router = useRouter();
   const create = useMutation(api.documents.create);
   const archive = useMutation(api.documents.archive);
+  const update = useMutation(api.documents.update);
+  const { rewrite, isLoading } = useRewrite();
 
   const onArchive = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
@@ -93,6 +99,27 @@ const Item = React.memo(({
       error: "Failed to create note.",
     });
   }, [id, create, expanded, onExpand, router]);
+
+  const onRewrite = useCallback(async (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (!id || !content || isLoading) return;
+    
+    try {
+      const promise = (async () => {
+        const rewritten = await rewrite(content, {});
+        await update({
+          id,
+          content: JSON.stringify(rewritten, null, 2),
+        });
+      })();
+      toast.promise(promise, {
+        loading: "Rewriting note...",
+        success: "Note rewritten",
+        error: (e) => e?.message || "Failed to rewrite",
+      });
+      await promise;
+    } catch {}
+  }, [id, content, rewrite, update, isLoading]);
 
   // Memoize the chevron icon to prevent unnecessary re-renders
   const ChevronIcon = useMemo(() => expanded ? ChevronDown : ChevronRight, [expanded]);
@@ -155,6 +182,12 @@ const Item = React.memo(({
               side="right"
               forceMount
             >
+              {content && (
+                <DropdownMenuItem onClick={onRewrite} disabled={isLoading}>
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Rewrite with AI
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={onArchive}>
                 <Trash className="mr-2 h-4 w-4" />
                 Delete

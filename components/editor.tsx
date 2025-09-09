@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect } from "react";
 import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -33,6 +34,18 @@ const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
       : undefined,
     uploadFile: handleUpload,
   });
+
+  // Update editor content when initialContent changes
+  useEffect(() => {
+    if (initialContent) {
+      try {
+        const newContent = JSON.parse(initialContent) as PartialBlock[];
+        editor.replaceBlocks(editor.document, newContent);
+      } catch (error) {
+        console.error("Error updating editor content:", error);
+      }
+    }
+  }, [initialContent, editor]);
 
   const handleEditorChange = () => {
     onChange(JSON.stringify(editor.document, null, 2));

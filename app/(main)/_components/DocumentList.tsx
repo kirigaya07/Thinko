@@ -90,6 +90,7 @@ const DocumentList = React.memo(
               level={level}
               onExpand={() => onExpand(document._id)}
               expanded={expanded[document._id]}
+              content={document.content}
             />
             {expanded[document._id] && (
               <DocumentList parentDocumentId={document._id} level={level + 1} />

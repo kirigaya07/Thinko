@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 
 import { Cover } from "@/components/cover";
 import { Toolbar } from "@/components/toolbar";
@@ -18,13 +18,15 @@ interface DocumentIdPageProps {
 }
 
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
+  const { documentId } = params;
+
   const Editor = useMemo(
     () => dynamic(() => import("@/components/editor"), { ssr: false }),
     [],
   );
 
   const document = useQuery(api.documents.getById, {
-    documentId: params.documentId,
+    documentId,
   });
 
   const update = useMutation(api.documents.update);
@@ -32,11 +34,11 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   const onChange = useCallback(
     (content: string) => {
       update({
-        id: params.documentId,
+        id: documentId,
         content,
       });
     },
-    [update, params.documentId],
+    [update, documentId],
   );
 
   if (document === undefined) {

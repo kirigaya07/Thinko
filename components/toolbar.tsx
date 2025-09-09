@@ -11,7 +11,9 @@ import { useCoverImage } from "@/hooks/useCoverImage";
 import { Button } from "./ui/button";
 import TextareaAutosize from "react-textarea-autosize";
 import { IconPicker } from "./icon-picker";
-import { ImageIcon, Smile, X } from "lucide-react";
+import { ImageIcon, Smile, X, Wand2 } from "lucide-react";
+import { useRewrite } from "@/hooks/useRewrite";
+import { toast } from "sonner";
 
 interface ToolbarProps {
   initialData: Doc<"documents">;
@@ -27,6 +29,7 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
   const update = useMutation(api.documents.update);
   const removeIcon = useMutation(api.documents.removeIcon);
   const coverImage = useCoverImage();
+  const { rewrite, isLoading } = useRewrite();
 
   const enableInput = () => {
     if (preview) return;
@@ -66,6 +69,26 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
     removeIcon({
       id: initialData._id,
     });
+  };
+
+  const onRewrite = async () => {
+    if (preview || isLoading) return;
+    try {
+      const promise = (async () => {
+        const source = initialData.content || "[]";
+        const rewritten = await rewrite(source, {});
+        await update({
+          id: initialData._id,
+          content: JSON.stringify(rewritten, null, 2),
+        });
+      })();
+      toast.promise(promise, {
+        loading: "Rewriting note...",
+        success: "Note rewritten",
+        error: (e) => e?.message || "Failed to rewrite",
+      });
+      await promise;
+    } catch {}
   };
 
   return (
@@ -112,6 +135,18 @@ export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
           >
             <ImageIcon className="mr-2 h-4 w-4" />
             Add Cover
+          </Button>
+        )}
+        {!preview && (
+          <Button
+            onClick={onRewrite}
+            disabled={isLoading}
+            className="text-xs text-muted-foreground"
+            variant="outline"
+            size="sm"
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            Rewrite
           </Button>
         )}
       </div>

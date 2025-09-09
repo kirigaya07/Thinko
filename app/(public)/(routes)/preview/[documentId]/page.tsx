@@ -18,20 +18,21 @@ interface DocumentIdPageProps {
 }
 
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
+  const { documentId } = params;
   const Editor = useMemo(
     () => dynamic(() => import("@/components/editor"), { ssr: false }),
     [],
   );
 
   const document = useQuery(api.documents.getById, {
-    documentId: params.documentId,
+    documentId,
   });
 
   const update = useMutation(api.documents.update);
 
   const onChange = (content: string) => {
     update({
-      id: params.documentId,
+      id: documentId,
       content,
     });
   };
